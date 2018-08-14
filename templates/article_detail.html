@@ -2,4 +2,12 @@
 
 {% block content %}
     {% include "_article.html" with article=article only %}
+    <hr>
+<h4>Comments</h4>
+{% for comment in article.comment_set.all %}
+    <p><em>Posted by {{ comment.name }}</em></p>
+    {{ comment|linebreaks }}
+{% empty %}
+    No comments yet.
+{% endfor %}
 {% endblock %}

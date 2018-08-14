@@ -1,5 +1,6 @@
 from django.test import TestCase
 from .models import Articles
+from .models import Comment
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 
@@ -13,9 +14,12 @@ class ModelTesting(TestCase):
         self.article_title = "World class code"
         self.some_user = User.objects.create(username="nerd")
         self.article = Articles(title=self.article_title, author=self.some_user)
+        self.comment = Comment (body = self.article_title)
 
     def string_representation(self):
         self.assertEqual(str(self.article), self.article.title)
+        self.assertEqual(str(self.comment), self.article_title)
+
 
     def test_model_create_article(self):
         old_count = Articles.objects.count()
