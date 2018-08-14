@@ -17,8 +17,10 @@ from django.contrib import admin
 from django.conf.urls import url
 from django.conf.urls import include
 from . import views
+import blog_article.urls
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^', include(blog_article.urls)),
     url(r'^$', views.HomeView.as_view(), name = 'home'),
 ]

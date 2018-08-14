@@ -1,0 +1,31 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flying circus</title>
+    <link rel="stylesheet" href="{% static 'css/foundation.css' %}">
+</head>
+<body>
+    <section class="row">
+        <header class="large-12 columns">
+            <h1><h1> Welkome to Peter Python`s Blog!</h1></h1>
+            <hr>
+        </header>
+    </section>
+
+    <section class="row">
+
+        <div class="large-8 columns">
+            {% block content %}
+            {% endblock %}
+        </div>
+
+        <div class="large-4 columns">
+            <h3>About Me</h3>
+            <p>I started coding 22 minutes ago.</p>
+        </div>
+
+    </section>
+
+</body>
+</html>
