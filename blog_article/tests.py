@@ -1,5 +1,4 @@
 from django.test import TestCase
-import logging
 from .models import Articles
 from django.contrib.auth.models import User
 
@@ -7,7 +6,7 @@ from django.contrib.auth.models import User
 
 class ModelTesting(TestCase):
 
-    logger = logging.getLogger(__name__)
+
 
     def setUp(self):
         self.article_title = "World class code"
@@ -22,3 +21,12 @@ class ModelTesting(TestCase):
         self.article.save()
         new_count = Articles.objects.count()
         self.assertNotEqual(old_count, new_count)
+
+class MapingTesting(TestCase):
+
+    def setUp(self):
+        self.response_start_page = self.client.get('/')
+
+
+    def test_start_page(self):
+        self.assertEqual(self.response_start_page.status_code, 200)
