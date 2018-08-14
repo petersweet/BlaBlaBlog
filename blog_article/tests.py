@@ -3,6 +3,7 @@ from .models import Articles
 from .models import Comment
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
+from .forms import CommentForm
 
 # Create your tests here.
 
@@ -27,6 +28,41 @@ class ModelTesting(TestCase):
         new_count = Articles.objects.count()
         self.assertNotEqual(old_count, new_count)
 
+class CommentFormTest(TestCase):
+
+    def setUp(self):
+        self.article_title = "World class code"
+        self.some_user = get_user_model().objects.create(username="nerd")
+        self.article = Articles(title=self.article_title, author=self.some_user)
+
+    def test_init(self):
+        CommentForm(article=self.article)
+
+    def test_init_without_entry(self):
+        with self.assertRaises(KeyError):
+            CommentForm()
+
+    def test_valid_data(self):
+        form = CommentForm({
+            'name': "Peter Sweet",
+            'email': "Grynevich@example.com",
+            'body': "Hi there",
+        }, article=self.article)
+        self.assertTrue(form.is_valid())
+        comment = form.save()
+        self.assertEqual(comment.name, "Peter Sweet")
+        self.assertEqual(comment.email, "Grynevich@example.com")
+        self.assertEqual(comment.body, "Hi there")
+        self.assertEqual(comment.entry, self.article)
+
+    def test_blank_data(self):
+        form = CommentForm({}, article=self.article)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors, {
+            'name': ['This field is required.'],
+            'email': ['Thi[55 chars]d.'],
+            'body': ['required'],
+        })
 
 class HomePageTesting(TestCase):
 
