@@ -1,5 +1,7 @@
 from django.db import models
 from django.urls import reverse
+from django.template.defaultfilters import slugify
+
 
 
 
@@ -7,8 +9,8 @@ from django.urls import reverse
 
 class Articles (models.Model):
     title = models.CharField(max_length=100)
-    slug = models.SlugField()
     body = models.TextField()
+    slug = models.SlugField(default='')
     author = models.ForeignKey(
         'auth.User',
         related_name='article',
@@ -21,7 +23,16 @@ class Articles (models.Model):
         return "{}".format(self.title, self.body, self.date_created, self.date_modified)
 
     def get_absolute_url(self):
-        return reverse('article_detail', kwargs={'pk': self.pk})
+        kwargs = {'year': self.date_created.year,
+                  'month': self.date_created.month,
+                  'day': self.date_created.day,
+                  'slug': self.slug,
+                  'pk': self.pk}
+        return reverse('article_detail', kwargs=kwargs)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
 class Comment(models.Model):
     article = models.ForeignKey(
