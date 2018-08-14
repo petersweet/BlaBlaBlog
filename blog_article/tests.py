@@ -1,3 +1,4 @@
+from django.template import Context, Template
 from django.test import TestCase
 from .models import Articles
 from .models import Comment
@@ -108,3 +109,27 @@ class EntryViewTest(TestCase):
 
     def test_get_absolute_url(self):
         self.assertIsNotNone(self.article.get_absolute_url())
+
+
+class EntryHistoryTagTest(TestCase):
+
+    TEMPLATE = Template("{% load blog_tags %} {% article_history %}")
+
+    def setUp(self):
+        self.user = get_user_model().objects.create(username='nerd')
+
+    def test_entry_shows_up(self):
+        article = Articles.objects.create(author=self.user, title="My entry title")
+        rendered = self.TEMPLATE.render(Context({}))
+        self.assertIn(article.title, rendered)
+
+    def test_no_posts(self):
+        rendered = self.TEMPLATE.render(Context({}))
+        self.assertIn("No recent articles", rendered)
+
+    def test_many_posts(self):
+        for n in range(6):
+            Articles.objects.create(author=self.user, title="Post #{0}".format(n))
+        rendered = self.TEMPLATE.render(Context({}))
+        self.assertIn("Post #5", rendered)
+        self.assertNotIn("Post #6", rendered)

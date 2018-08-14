@@ -1,0 +1,7 @@
+<ul>
+    {% for article in articles %}
+        <li>{{ article.title }}</li>
+        {% empty %}
+        <li>No recent articles</li>
+    {% endfor %}
+</ul>
