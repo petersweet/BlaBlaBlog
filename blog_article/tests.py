@@ -5,6 +5,8 @@ from .models import Comment
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from .forms import CommentForm
+from django.template.defaultfilters import slugify
+import datetime
 
 # Create your tests here.
 
@@ -100,15 +102,41 @@ class HomePageTesting(TestCase):
 class EntryViewTest(TestCase):
 
     def setUp(self):
+        self.some_title = "This is my test title"
+        self.today = datetime.date.today()
+        self.slug = slugify(self.some_title)
         self.user = get_user_model().objects.create(username="nerd")
         self.article = Articles.objects.create(title='1-title', body='1-body', author=self.user)
         self.response_entry = self.client.get(self.article.get_absolute_url())
+        self.response_url = self.client.get(self.url)
+        self.response_get = self.client.get("/0000/00/00/0-invalid/")
+        self.url = "/{year}/{month}/{day}/{pk}-{slug}/".format(
+            year=self.today.year,
+            month=self.today.month,
+            day=self.today.day,
+            slug=self.slug,
+            pk=self.article.pk,
+        )
+        self.url_test = "/0000/00/00/{0}-misdated/".format(self.article.id)
 
     def test_basic_view(self):
         self.assertEqual(self.response_entry.status_code, 200)
 
     def test_get_absolute_url(self):
         self.assertIsNotNone(self.article.get_absolute_url())
+
+    def test_url(self):
+        self.assertEqual(self.response_url.status_code, 200)
+        self.assertTemplateUsed(self.response_url,
+                                template_name='blog/entry_detail.html')
+
+    def test_misdated_url(self):
+        self.assertEqual(self.response_url.status_code, 200)
+        self.assertTemplateUsed(self.response_url,
+                                template_name='blog/entry_detail.html')
+
+    def test_invalid_url(self):
+        self.assertEqual(self.response_get.status_code, 404)
 
 
 class EntryHistoryTagTest(TestCase):

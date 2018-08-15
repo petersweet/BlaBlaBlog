@@ -10,7 +10,7 @@ from django.template.defaultfilters import slugify
 class Articles (models.Model):
     title = models.CharField(max_length=100)
     body = models.TextField()
-    slug = models.SlugField(default='')
+    slug = models.SlugField(default='', editable=False)
     author = models.ForeignKey(
         'auth.User',
         related_name='article',
